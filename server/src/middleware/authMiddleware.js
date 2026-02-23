@@ -1,34 +1,46 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
-// 🔐 Protect Middleware
-const protect = (req, res, next) => {
+const protect = async (req, res, next) => {
   let token;
 
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    token = req.headers.authorization.split(' ')[1];
+  if (req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")) {
 
     try {
+      token = req.headers.authorization.split(" ")[1];
+
+      console.log("TOKEN RECEIVED:", token);
+      console.log("JWT SECRET:", process.env.JWT_SECRET);
+
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      req.user = decoded;
+
+      console.log("DECODED:", decoded);
+
+      req.user = await User.findById(decoded.id).select("-password");
+
       next();
+
     } catch (error) {
-      return res.status(401).json({ message: 'Not authorized, token failed' });
+      console.log("JWT ERROR:", error.message);
+      return res.status(401).json({
+        message: "Not authorized, token failed"
+      });
     }
   }
 
   if (!token) {
-    return res.status(401).json({ message: 'Not authorized, no token' });
+    return res.status(401).json({
+      message: "Not authorized, no token"
+    });
   }
 };
-
-// 👑 Role Authorization
-const authorize = (role) => {
+const authorize = (...roles) => {
   return (req, res, next) => {
-    if (req.user.role !== role) {
-      return res.status(403).json({ message: 'Access denied' });
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        message: "Access denied. Not authorized."
+      });
     }
     next();
   };
