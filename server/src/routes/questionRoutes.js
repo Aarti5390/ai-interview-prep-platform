@@ -5,6 +5,7 @@ const {
   createQuestion,
   getAllQuestions,
   deleteQuestion,
+  generateAIQuestions
 } = require("../controllers/questionController");
 
 const { protect, authorize } = require("../middleware/authMiddleware");
@@ -17,5 +18,7 @@ router.get("/", protect, getAllQuestions);
 
 // Admin deletes question
 router.delete("/:id", protect, authorize("admin"), deleteQuestion);
+
+router.post("/generate", protect, authorize("admin"), generateAIQuestions);
 
 module.exports = router;

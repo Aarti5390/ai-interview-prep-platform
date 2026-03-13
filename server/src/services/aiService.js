@@ -65,3 +65,43 @@ Return ONLY JSON in this format:
 };
 
 module.exports = { evaluateAnswer };
+
+const generateQuestions = async (topic, difficulty, count) => {
+
+  const prompt = `
+You are a technical interviewer.
+
+Generate ${count} interview questions.
+
+Topic: ${topic}
+Difficulty: ${difficulty}
+
+Return ONLY JSON:
+
+{
+ "questions": [
+   "question 1",
+   "question 2",
+   "question 3"
+ ]
+}
+`;
+
+  const completion = await groq.chat.completions.create({
+    model: "llama-3.1-8b-instant",
+    messages: [
+      {
+        role: "user",
+        content: prompt
+      }
+    ]
+  });
+
+  const aiText = completion.choices[0].message.content;
+
+  const jsonMatch = aiText.match(/\{[\s\S]*\}/);
+
+  return JSON.parse(jsonMatch[0]);
+};
+
+module.exports = { evaluateAnswer, generateQuestions };

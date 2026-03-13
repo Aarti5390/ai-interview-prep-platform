@@ -7,10 +7,17 @@ const questionSchema = new mongoose.Schema(
       required: true,
     },
     category: {
-      type: String,
-      enum: ["DSA", "HR", "System Design"],
-      required: true,
-    },
+  type: String,
+  enum: [
+    "JavaScript",
+    "React",
+    "Node.js",
+    "MongoDB",
+    "Express",
+    "DSA"
+  ],
+  required: true
+},
     difficulty: {
       type: String,
       enum: ["easy", "medium", "hard"],
