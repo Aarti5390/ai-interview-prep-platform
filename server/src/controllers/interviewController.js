@@ -1,167 +1,149 @@
 const Interview = require("../models/interview");
 const Question = require("../models/Question");
-const { evaluateAnswer } = require("../services/aiService");
-
+const { evaluateAnswer, generateQuestions } = require("../services/aiService");
 
 // START INTERVIEW
 exports.startInterview = async (req, res) => {
+  try {
+    const { category, difficulty, numQuestions } = req.body;
 
-try {
+    // Generate questions from AI (returns array of { question, sampleAnswer, ... })
+    const aiQuestions = await generateQuestions({ category, difficulty, numQuestions });
 
-    const userId = req.user.id;
+    if (!aiQuestions || aiQuestions.length === 0) {
+      throw new Error("No questions generated. Please try again.");
+    }
 
-    const questions = await Question.aggregate([
-        { $sample: { size: 5 } }
-    ]);
+    // 🔥 Map AI output to match your Interview schema: rename question -> text
+    const formattedQuestions = aiQuestions.map(q => ({
+      text: q.question,                 // required by schema
+      sampleAnswer: q.sampleAnswer || "",
+      userAnswer: null,
+      score: null,
+      feedback: null,
+    }));
 
-    const interview = new Interview({
-        user: userId,
-        questions: questions.map(q => ({
-            question: q._id
-        }))
+    const interview = await Interview.create({
+      user: req.user.id,
+      category,
+      difficulty,
+      questions: formattedQuestions,
+      currentQuestionIndex: 0,
+      status: "in-progress"
     });
 
-    await interview.save();
-
-    res.json({
-        message: "Interview started successfully",
-        interviewId: interview._id
-    });
-
-} catch (error) {
-
-    res.status(500).json({
-        message: "Failed to start interview",
-        error: error.message
-    });
-
-}
+    res.json({ interviewId: interview._id });
+  } catch (error) {
+    console.error("❌ START INTERVIEW ERROR:", error);
+    res.status(500).json({ message: error.message, stack: error.stack });
+  }
 };
 
-
-
 // GET CURRENT QUESTION
-exports.getCurrentQuestion = async (req, res) => {
-
-try {
-
-    const interview = await Interview.findById(req.params.id)
-        .populate("questions.question");
-
-    if (!interview) {
-        return res.status(404).json({
-            message: "Interview not found"
-        });
-    }
+exports.getQuestion = async (req, res) => {
+  try {
+    const interview = await Interview.findById(req.params.id);
+    if (!interview) return res.status(404).json({ message: "Interview not found" });
 
     const index = interview.currentQuestionIndex;
 
-    if (index >= interview.questions.length) {
-
-        return res.json({
-            message: "Interview completed"
-        });
-
+    if (!interview.questions || index >= interview.questions.length) {
+      interview.status = "completed";
+      await interview.save();
+      return res.json({ completed: true });
     }
 
-    const currentQuestion = interview.questions[index].question;
+    const questionObj = interview.questions[index];
+    if (!questionObj) return res.status(500).json({ message: "Question object missing" });
 
-    res.json({
-        question: currentQuestion
-    });
-
-} catch (error) {
-
-    res.status(500).json({
-        message: "Error fetching question"
-    });
-
-}
+    res.json({ question: questionObj.text });
+  } catch (error) {
+    console.error("❌ GET QUESTION ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
 };
-
-
 
 // SUBMIT ANSWER
 exports.submitAnswer = async (req, res) => {
-
-try {
-
+  try {
     const { answer } = req.body;
-
-    const interview = await Interview.findById(req.params.id)
-        .populate("questions.question");
-
-    if (!interview) {
-        return res.status(404).json({
-            message: "Interview not found"
-        });
-    }
+    const interview = await Interview.findById(req.params.id);
+    if (!interview) return res.status(404).json({ message: "Interview not found" });
 
     const index = interview.currentQuestionIndex;
+     // 🔥 Check if the question exists
+    if (!interview.questions || index >= interview.questions.length) {
+      return res.status(400).json({ message: "No more questions or invalid index" });
+    }
+    const question = interview.questions[index];
 
-    const current = interview.questions[index];
+    // AI evaluation using the question text
+    const result = await evaluateAnswer(question.text, answer);
 
-    const questionText = current.question.questionText || current.question.title || "";
+    // Store the answer and evaluation
+    question.userAnswer = answer;
+    question.score = result.score;
+    question.feedback = result.feedback;
+    question.strengths = result.strengths;
+    question.weaknesses = result.weaknesses;
+    question.suggestions = result.suggestions;
 
-    const evaluation = await evaluateAnswer(
-        questionText,
-        answer
-    );
-
-    current.answer = answer;
-    current.score = evaluation.score;
-    current.feedback = evaluation.feedback;
-
+    // Move to next question
     interview.currentQuestionIndex += 1;
 
-    if (interview.currentQuestionIndex >= interview.questions.length) {
-        interview.status = "completed";
-    }
-
     await interview.save();
+     question.feedback = `Strengths: ${result.strengths}. Weaknesses: ${result.weaknesses}. Suggestions: ${result.suggestions}`;
+
 
     res.json({
-        message: "Answer submitted successfully",
-        evaluation
+      score: result.score,
+      message: "Answer submitted. Click Next to continue."
     });
-
-} catch (error) {
-
-    res.status(500).json({
-        message: "Error submitting answer",
-        error: error.message
-    });
-
-}
+  } catch (error) {
+    console.error("❌ SUBMIT ANSWER ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
 };
 
+// GET RESULT
+exports.getResult = async (req, res) => {
+  try {
+    const interview = await Interview.findById(req.params.id);
+    if (!interview) return res.status(404).json({ message: "Interview not found" });
 
+    const totalQuestions = interview.questions.length;
+    const attempted = interview.questions.filter(q => q.userAnswer).length;
+    const totalScore = interview.questions.reduce((sum, q) => sum + (q.score || 0), 0);
+    const averageScore = totalQuestions ? Math.round(totalScore / totalQuestions) : 0;
 
-// GET INTERVIEW RESULT
-exports.getInterviewResult = async (req, res) => {
-
-try {
-
-    const interview = await Interview.findById(req.params.id)
-        .populate("questions.question");
-
-    if (!interview) {
-
-        return res.status(404).json({
-            message: "Interview not found"
-        });
-
-    }
+    // Basic insights (you can later enhance with AI)
+    const strengths = "Good conceptual clarity";
+    const weaknesses = "Needs deeper explanations";
+    const suggestions = "Practice more real-world questions";
 
     res.json({
-        interview
+      summary: {
+        totalQuestions,
+        attempted,
+        remaining: totalQuestions - attempted,
+        averageScore
+      },
+      insights: { strengths, weaknesses, suggestions },
+      questions: interview.questions
     });
+  } catch (error) {
+    console.error("❌ GET RESULT ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
-} catch (error) {
-
-    res.status(500).json({
-        message: "Error fetching interview result"
-    });
-
-}
+// GET INTERVIEW HISTORY
+exports.getHistory = async (req, res) => {
+  try {
+    const interviews = await Interview.find({ user: req.user.id }).sort({ createdAt: -1 });
+    res.json(interviews);
+  } catch (error) {
+    console.error("❌ GET HISTORY ERROR:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 };

@@ -125,6 +125,16 @@
   border: 1px solid #e2e8f0;
   line-height: 1.6;
 }
+.success-message {
+  color: #28a745;
+  font-weight: bold;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.submission-message {
+  text-align: center;
+}
 
 .error-message {
   background: #fee2e2;

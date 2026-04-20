@@ -19,7 +19,7 @@ router.post(
 router.get(
     "/:id/question",
     protect,
-    interviewController.getCurrentQuestion
+    interviewController.getQuestion
 );
 
 
@@ -35,7 +35,12 @@ router.post(
 router.get(
     "/:id/result",
     protect,
-    interviewController.getInterviewResult
+    interviewController.getResult
+);
+router.get(
+    "/history",
+    protect,
+    interviewController.getHistory
 );
 
 

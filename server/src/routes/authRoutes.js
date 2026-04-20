@@ -15,6 +15,10 @@ router.get('/profile', protect, (req, res) => {
     user: req.user
   });
 });
+router.get("/me", protect, async (req, res) => {
+  res.json(req.user);
+});
+
 
 // Admin only route
 router.get('/admin', protect, authorize('admin'), (req, res) => {

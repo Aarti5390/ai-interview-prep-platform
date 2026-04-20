@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import API from '../api/api'; // 👈 Use the configured axios instance
+import API from '../api/api';
 import './ResultPage.css';
 
 const ResultPage = () => {
@@ -11,7 +11,6 @@ const ResultPage = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // 🛡️ Guard: don't fetch if id is missing
     if (!id) {
       setError('No interview ID provided');
       setLoading(false);
@@ -30,7 +29,7 @@ const ResultPage = () => {
     };
 
     fetchResult();
-  }, [id]); // 👈 Re-run if id changes (though it shouldn't)
+  }, [id]);
 
   const goToDashboard = () => {
     navigate('/dashboard');
@@ -48,6 +47,11 @@ const ResultPage = () => {
     );
   }
 
+  // Calculate highest score from the questions array
+  const highestScore = result.questions.length > 0
+    ? Math.max(...result.questions.map(q => q.score || 0))
+    : 0;
+
   return (
     <div className="result-container">
       <div className="result-card">
@@ -64,7 +68,7 @@ const ResultPage = () => {
           </div>
           <div className="stat-item">
             <span className="stat-label">Highest Score</span>
-            <span className="stat-value">{result.summary.highestScore}</span>
+            <span className="stat-value">{highestScore}</span>
           </div>
         </div>
 
@@ -74,11 +78,21 @@ const ResultPage = () => {
             <div key={index} className="question-review">
               <div className="question-header">
                 <span className="question-number">Q{index + 1}</span>
-                <span className="question-score">Score: {q.score}</span>
+                <span className="question-score">Score: {q.score}/10</span>
               </div>
               <p className="question-text"><strong>Question:</strong> {q.text}</p>
-              <p className="user-answer"><strong>Your Answer:</strong> {q.userAnswer}</p>
-              <p className="ai-feedback"><strong>AI Feedback:</strong> {q.feedback}</p>
+              <p className="user-answer"><strong>Your Answer:</strong> {q.userAnswer || "Not answered"}</p>
+              
+              {/* Display the three detailed feedback fields */}
+              <div className="ai-feedback">
+                <strong>Strengths:</strong> {q.strengths || "—"}
+              </div>
+              <div className="ai-feedback">
+                <strong>Weaknesses:</strong> {q.weaknesses || "—"}
+              </div>
+              <div className="ai-feedback">
+                <strong>Suggestions for improvement:</strong> {q.suggestions || "—"}
+              </div>
             </div>
           ))}
         </div>
