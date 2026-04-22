@@ -87,9 +87,6 @@ const LandingPage = () => {
               Unlock Your Career Potential with AI Interview Prep.
               Practice with real-time AI feedback and ace your next interview.
             </p>
-            <p className="sub-text">
-              Join thousands of successful candidates who landed their dream jobs.
-            </p>
           </div>
 
           <div className="right-panel">
