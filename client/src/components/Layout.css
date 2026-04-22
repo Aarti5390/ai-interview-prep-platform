@@ -41,20 +41,20 @@
   padding-top: 20px;
 }
 
-/* Reduced padding for History, Statistics, Settings – still enough room for the fixed button */
+/* Reduced padding for History, Statistics, Settings */
 .layout-content.reduced-padding {
   padding-top: 60px;
 }
 
-/* Remove extra margin from page headings */
-.history-page h1,
-.statistics-page h1,
-.settings-page h1,
-.history-page h2,
-.statistics-page h2,
-.settings-page h2 {
-  margin-top: 0;
-  padding-top: 0;
+/* Interview pages – NO extra top padding (content starts at the very top) */
+.layout-content.interview-page-content {
+  padding-top: 0 !important;
+}
+
+/* Remove any top margin from the first child inside the interview content */
+.layout-content.interview-page-content > :first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 
 /* Mobile adjustments */
@@ -77,10 +77,14 @@
   .layout-content.reduced-padding {
     padding-top: 55px;
   }
+  .layout-content.interview-page-content {
+    padding-top: 0 !important;
+  }
 }
-.history-page,
-.statistics-page,
-.settings-page {
+
+/* Extra resets */
+.history-page, .statistics-page, .settings-page,
+.interview-card, .setup-card {
   margin-top: 0;
   padding-top: 0;
 }

@@ -11,6 +11,10 @@ const Layout = ({ children }) => {
   const isHistory = location.pathname === '/history';
   const isStatistics = location.pathname === '/statistics';
   const isSettings = location.pathname === '/settings';
+  const isInterviewPage = location.pathname.includes('/interview/') || location.pathname === '/interview/setup';
+
+  // Debug log – check console
+  console.log('Layout path:', location.pathname, 'isInterviewPage:', isInterviewPage);
 
   const showBackButton = !isDashboard && !isAdmin;
 
@@ -22,6 +26,7 @@ const Layout = ({ children }) => {
   if (isDashboard) contentClass += ' dashboard-content';
   if (isAdmin) contentClass += ' admin-content';
   if (isHistory || isStatistics || isSettings) contentClass += ' reduced-padding';
+  if (isInterviewPage) contentClass += ' interview-page-content';
 
   return (
     <div className="layout-wrapper">

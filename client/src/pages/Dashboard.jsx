@@ -67,12 +67,16 @@ const Dashboard = () => {
 
       // Calculate total practice time in minutes
       let totalMinutes = 0;
-      completed.forEach(interview => {
-        if (interview.startedAt && interview.endedAt) {
-          const diff = new Date(interview.endedAt) - new Date(interview.startedAt);
-          totalMinutes += Math.floor(diff / 60000); // minutes
-        }
-      });
+completed.forEach(interview => {
+  if (interview.startedAt && interview.endedAt) {
+    const diff = new Date(interview.endedAt) - new Date(interview.startedAt);
+    totalMinutes += Math.floor(diff / 60000);
+  } else {
+    // Fallback: assume 2 minutes per question for old interviews
+    const answeredCount = interview.questions.filter(q => q.userAnswer).length;
+    totalMinutes += answeredCount * 2; // 2 minutes per answered question
+  }
+});
 
       setStats({
         overallScore: avgScore,

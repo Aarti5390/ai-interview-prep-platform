@@ -171,3 +171,18 @@
   cursor: pointer;
   margin-top: 1rem;
 }
+/* Force remove any top margin/padding from the interview page */
+.interview-container {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.interview-card {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.interview-card h1:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}

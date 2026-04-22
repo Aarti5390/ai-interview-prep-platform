@@ -65,3 +65,18 @@ button:disabled {
   margin: 1rem 0;
   text-align: center;
 }
+/* Force remove any top margin/padding from the setup page */
+.setup-container {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.setup-card {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.setup-card h1:first-child {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}

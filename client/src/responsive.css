@@ -287,3 +287,20 @@
     font-size: 1rem;
   }
 }
+/* Reduce top space on interview pages */
+body:has(.interview-card) .layout-content,
+body:has(.setup-card) .layout-content {
+  padding-top: 60px !important;
+}
+
+@media (max-width: 768px) {
+  body:has(.interview-card) .layout-content,
+  body:has(.setup-card) .layout-content {
+    padding-top: 55px !important;
+  }
+}
+.interview-card h1,
+.interview-card h2,
+.interview-card h3 {
+  margin-top: 0;
+}

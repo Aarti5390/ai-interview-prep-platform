@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import API from '../api/api';
+import html2pdf from 'html2pdf.js';
 import './ResultPage.css';
 
 const ResultPage = () => {
@@ -34,6 +35,13 @@ const ResultPage = () => {
     fetchResult();
   }, [id]);
 
+  const downloadPDF = () => {
+    const element = document.getElementById('result-content');
+    if (element) {
+      html2pdf().from(element).save('interview-report.pdf');
+    }
+  };
+
   const goToDashboard = () => {
     navigate('/dashboard');
   };
@@ -66,7 +74,7 @@ const ResultPage = () => {
 
   return (
     <div className="result-container">
-      <div className="result-card">
+      <div className="result-card" id="result-content">
         <h1>Interview Results</h1>
 
         <div className="summary-stats">
@@ -115,9 +123,14 @@ const ResultPage = () => {
           </div>
         )}
 
-        <button onClick={goToDashboard} className="dashboard-btn">
-          <i className="fas fa-arrow-left"></i> Back to Dashboard
-        </button>
+        <div className="action-buttons">
+          <button onClick={downloadPDF} className="pdf-download-btn">
+            <i className="fas fa-file-pdf"></i> Download PDF Report
+          </button>
+          <button onClick={goToDashboard} className="dashboard-btn">
+            <i className="fas fa-arrow-left"></i> Back to Dashboard
+          </button>
+        </div>
       </div>
     </div>
   );
