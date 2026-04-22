@@ -15,10 +15,10 @@ body {
   background-image: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
   background-size: cover;
   background-position: center;
-  background-attachment: fixed; /* optional parallax effect */
+  background-attachment: fixed;
 }
 
-/* Gradient overlay (improvement 3) */
+/* Gradient overlay */
 .overlay {
   background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.5) 100%);
   min-height: 100vh;
@@ -29,19 +29,19 @@ body {
   padding: 1rem;
 }
 
-/* ===== Main card with fade‑in animation (improvement 10) ===== */
+/* ===== Main card with fade‑in animation ===== */
 .card {
   max-width: 1200px;
   width: 100%;
   background-color: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 2rem;                /* improvement 8 */
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4); /* improvement 8 */
+  border-radius: 2rem;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: fadeInUp 0.8s ease-out;   /* improvement 10 */
+  animation: fadeInUp 0.8s ease-out;
 }
 
 @keyframes fadeInUp {
@@ -61,7 +61,7 @@ body {
   }
 }
 
-/* ===== Left panel (text) ===== */
+/* ===== Left panel ===== */
 .left-panel {
   padding: 2rem;
   color: white;
@@ -78,7 +78,7 @@ body {
 }
 
 .left-panel h1 {
-  font-size: clamp(2rem, 5vw, 3.5rem); /* improvement 9 */
+  font-size: clamp(2rem, 5vw, 3.5rem);
   font-weight: 700;
   margin-bottom: 1rem;
   line-height: 1.2;
@@ -97,10 +97,10 @@ body {
   opacity: 0.8;
 }
 
-/* ===== Right panel (glassmorphism form) ===== */
+/* ===== Right panel ===== */
 .right-panel {
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.2);  /* improvement 2 */
+  background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-left: 1px solid rgba(255, 255, 255, 0.3);
@@ -117,10 +117,10 @@ body {
   }
 }
 
-/* Form wrapper for smooth transition (improvement 1) */
+/* Form wrapper – adjusted min-height */
 .form-wrapper {
   position: relative;
-  min-height: 480px; /* Enough to contain both forms comfortably */
+  min-height: 380px; /* was 480px – removes extra space */
 }
 
 .form-container {
@@ -149,7 +149,7 @@ body {
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Input groups with icons (improvement 4) */
+/* Input groups */
 .input-group {
   position: relative;
   margin-bottom: 1rem;
@@ -167,7 +167,7 @@ body {
 
 .form-input {
   width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem; /* left padding for icon */
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
   border: none;
   border-radius: 0.75rem;
   background: rgba(255, 255, 255, 0.9);
@@ -199,7 +199,7 @@ body {
   text-decoration: underline;
 }
 
-/* Buttons with hover effects (improvement 5) */
+/* Buttons */
 .btn-primary,
 .btn-success {
   width: 100%;
@@ -234,52 +234,9 @@ body {
   box-shadow: 0 8px 15px rgba(34, 197, 94, 0.4);
 }
 
-/* Social login section (improvement 6) */
-.social-login {
-  margin-top: 1.5rem;
-  text-align: center;
-}
+/* Social login block – DELETED (no longer present) */
 
-.text-muted {
-  color: #ddd;
-  font-size: 0.9rem;
-  margin-bottom: 0.75rem;
-  position: relative;
-}
-
-.social-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
-.social-btn {
-  flex: 1;
-  padding: 0.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  border-radius: 0.75rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.social-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-2px);
-}
-
-.social-btn i {
-  font-size: 1rem;
-}
-
-/* Toggle text between forms */
+/* Toggle text */
 .toggle-text {
   text-align: center;
   margin-top: 1.5rem;
@@ -301,7 +258,7 @@ body {
   opacity: 0.8;
 }
 
-/* Responsive adjustments */
+/* Responsive */
 @media (max-width: 767px) {
   .card {
     border-radius: 1.5rem;
@@ -311,6 +268,6 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.3);
   }
   .form-wrapper {
-    min-height: 500px;
+    min-height: 400px; /* slightly smaller on mobile too */
   }
 }

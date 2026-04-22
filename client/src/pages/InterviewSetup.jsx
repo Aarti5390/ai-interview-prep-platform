@@ -68,7 +68,7 @@ const InterviewSetup = () => {
               type="number"
               id="numQuestions"
               min="1"
-              max="10"
+              max="15"
               value={numQuestions}
               onChange={(e) => setNumQuestions(e.target.value)}
               required

@@ -149,3 +149,40 @@
   background-color: #ccc;
   cursor: not-allowed;
 }
+/* Logout button – small pill, fixed top-left, never full width */
+.admin-logout-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;      /* prevents block/full width */
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  width: auto;               /* force width to fit content */
+  max-width: fit-content;
+  margin: 0;                 /* remove any margins */
+}
+
+.admin-logout-btn:hover {
+  background-color: #b02a37;
+}
+
+/* Mobile adjustment */
+@media (max-width: 768px) {
+  .admin-logout-btn {
+    top: 10px;
+    left: 10px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}

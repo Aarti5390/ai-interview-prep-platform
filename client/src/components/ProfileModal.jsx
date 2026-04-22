@@ -3,6 +3,8 @@ import API from '../api/api';
 import './ProfileModal.css';
 
 const ProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
+  const BACKEND_URL = 'http://localhost:5000';
+
   const [formData, setFormData] = useState({
     name: '',
     qualification: '',
@@ -13,6 +15,7 @@ const ProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [uploadMessage, setUploadMessage] = useState({ type: '', text: '' });
   const [resumeFile, setResumeFile] = useState(null);
 
   useEffect(() => {
@@ -41,16 +44,18 @@ const ProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
     const data = new FormData();
     data.append('resume', resumeFile);
     setUploading(true);
-    setError('');
+    setUploadMessage({ type: '', text: '' });
     try {
       const res = await API.post('/profile/upload-resume', data, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setFormData(prev => ({ ...prev, resumeUrl: res.data.resumeUrl }));
-      alert('Resume uploaded successfully');
+      setUploadMessage({ type: 'success', text: 'Resume uploaded successfully!' });
       setResumeFile(null);
+      // Clear message after 3 seconds
+      setTimeout(() => setUploadMessage({ type: '', text: '' }), 3000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Upload failed');
+      setUploadMessage({ type: 'error', text: err.response?.data?.message || 'Upload failed' });
     } finally {
       setUploading(false);
     }
@@ -83,18 +88,23 @@ const ProfileModal = ({ isOpen, onClose, onProfileUpdate }) => {
             <input type="text" name="name" value={formData.name} onChange={handleChange} required />
           </div>
           <div className="form-group">
-            <label>Qualification (e.g., B.Tech, MCA)</label>
+            <label>Qualification</label>
             <input type="text" name="qualification" value={formData.qualification} onChange={handleChange} required />
           </div>
           <div className="form-group">
             <label>Resume (PDF/DOC)</label>
             <input type="file" accept=".pdf,.doc,.docx" onChange={handleFileChange} />
             {formData.resumeUrl && (
-              <a href={formData.resumeUrl} target="_blank" rel="noopener noreferrer">View uploaded resume</a>
+              <a href={`${BACKEND_URL}${formData.resumeUrl}`} target="_blank" rel="noopener noreferrer">
+                View uploaded resume
+              </a>
             )}
-            <button type="button" onClick={handleUploadResume} disabled={uploading || !resumeFile} style={{ marginTop: '0.5rem' }}>
+            <button type="button" onClick={handleUploadResume} disabled={uploading || !resumeFile}>
               {uploading ? 'Uploading...' : 'Upload Resume'}
             </button>
+            {uploadMessage.text && (
+              <div className={`upload-message ${uploadMessage.type}`}>{uploadMessage.text}</div>
+            )}
           </div>
           <div className="form-group">
             <label>Phone Number</label>

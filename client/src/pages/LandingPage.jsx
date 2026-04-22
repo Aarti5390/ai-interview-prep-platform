@@ -36,21 +36,17 @@ const LandingPage = () => {
       const res = await API.post("/auth/login", loginData);
       console.log("Login response:", res.data);
 
-      // 🔑 Handle different token locations
       const token = res.data.token || res.data.data?.token || res.data.accessToken;
       if (!token) throw new Error("No token in response");
 
       localStorage.setItem("token", token);
       console.log("Token stored:", localStorage.getItem("token"));
 
-      // 🔄 Set the token in axios default headers for subsequent requests
       API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      // 👤 Fetch the logged-in user's data to get the role
       const userRes = await API.get("/auth/me");
       const userRole = userRes.data.role;
 
-      // 🚀 Redirect based on role
       if (userRole === "admin") {
         navigate("/admin");
       } else {
@@ -79,15 +75,6 @@ const LandingPage = () => {
         text: error.response?.data?.message || "Registration failed"
       });
     }
-  };
-
-  // OAuth handlers
-  const handleGoogleLogin = () => {
-    window.location.href = `${API.defaults.baseURL}/auth/google`;
-  };
-
-  const handleGithubLogin = () => {
-    window.location.href = `${API.defaults.baseURL}/auth/github`;
   };
 
   return (
@@ -143,18 +130,6 @@ const LandingPage = () => {
                   <button type="submit" className="btn-primary">Log In</button>
                 </form>
 
-                <div className="social-login">
-                  <p className="text-muted">or continue with</p>
-                  <div className="social-buttons">
-                    <button className="social-btn google" onClick={handleGoogleLogin}>
-                      <i className="fab fa-google"></i> Google
-                    </button>
-                    <button className="social-btn github" onClick={handleGithubLogin}>
-                      <i className="fab fa-github"></i> GitHub
-                    </button>
-                  </div>
-                </div>
-
                 <p className="toggle-text">
                   Don't have an account?{" "}
                   <button onClick={() => setIsLogin(false)} className="toggle-link">
@@ -199,18 +174,6 @@ const LandingPage = () => {
                   </div>
                   <button type="submit" className="btn-success">Get Started for Free</button>
                 </form>
-
-                <div className="social-login">
-                  <p className="text-muted">or sign up with</p>
-                  <div className="social-buttons">
-                    <button className="social-btn google" onClick={handleGoogleLogin}>
-                      <i className="fab fa-google"></i> Google
-                    </button>
-                    <button className="social-btn github" onClick={handleGithubLogin}>
-                      <i className="fab fa-github"></i> GitHub
-                    </button>
-                  </div>
-                </div>
 
                 <p className="toggle-text">
                   Already have an account?{" "}

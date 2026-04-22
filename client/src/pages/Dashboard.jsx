@@ -49,12 +49,9 @@ const Dashboard = () => {
   const fetchInterviews = async () => {
     try {
       const res = await API.get("/interview/history");
-
-      // Support both old (array) and new (paginated object) response formats
       const interviewsData = Array.isArray(res.data) ? res.data : (res.data.interviews || []);
       setInterviews(interviewsData);
 
-      // Use interviewsData, not res.data
       const completed = interviewsData.filter(i => i.status === "completed");
       let totalScore = 0;
       let questionCount = 0;
@@ -68,6 +65,7 @@ const Dashboard = () => {
       });
       const avgScore = questionCount ? Math.round(totalScore / questionCount) : 0;
 
+      // Calculate total practice time in minutes
       let totalMinutes = 0;
       completed.forEach(interview => {
         if (interview.startedAt && interview.endedAt) {
@@ -79,7 +77,7 @@ const Dashboard = () => {
       setStats({
         overallScore: avgScore,
         completed: completed.length,
-        practiceTime: totalMinutes   // store in minutes
+        practiceTime: totalMinutes
       });
     } catch (error) {
       console.error(error);
@@ -88,6 +86,11 @@ const Dashboard = () => {
 
   const handleStartInterview = () => {
     navigate("/interview/setup");
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
   };
 
   const handleProfileUpdate = (updatedUser) => {
@@ -105,30 +108,10 @@ const Dashboard = () => {
 
         <nav className="sidebar-nav">
           <ul>
-            <li>
-              <Link to="/dashboard">
-                <i className="fas fa-tachometer-alt"></i>
-                <span>Dashboard</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/history">
-                <i className="fas fa-list"></i>
-                <span>My Interviews</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/statistics">
-                <i className="fas fa-brain"></i>
-                <span>Statistics</span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/settings">
-                <i className="fas fa-cog"></i>
-                <span>Settings</span>
-              </Link>
-            </li>
+            <li><Link to="/dashboard"><i className="fas fa-tachometer-alt"></i><span>Dashboard</span></Link></li>
+            <li><Link to="/history"><i className="fas fa-list"></i><span>My Interviews</span></Link></li>
+            <li><Link to="/statistics"><i className="fas fa-brain"></i><span>Statistics</span></Link></li>
+            <li><Link to="/settings"><i className="fas fa-cog"></i><span>Settings</span></Link></li>
           </ul>
         </nav>
 
@@ -144,6 +127,9 @@ const Dashboard = () => {
         <header className="content-header">
           <h1>Dashboard</h1>
           <div className="header-actions">
+            <button onClick={handleLogout} className="logout-header-btn" title="Logout">
+              <i className="fas fa-sign-out-alt"></i>
+            </button>
             <i
               className="fas fa-user-circle"
               onClick={() => setShowProfileModal(true)}
@@ -168,38 +154,22 @@ const Dashboard = () => {
 
         <div className="start-interview-container">
           <button className="start-interview-btn" onClick={handleStartInterview}>
-            <i className="fas fa-play-circle"></i>
-            Start AI Interview
+            <i className="fas fa-play-circle"></i> Start AI Interview
           </button>
         </div>
 
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-chart-line"></i>
-            </div>
-            <div className="stat-content">
-              <h3>Overall Prep Score</h3>
-              <p className="stat-value">{stats.overallScore}%</p>
-            </div>
+            <div className="stat-icon"><i className="fas fa-chart-line"></i></div>
+            <div className="stat-content"><h3>Overall Prep Score</h3><p className="stat-value">{stats.overallScore}%</p></div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-calendar-check"></i>
-            </div>
-            <div className="stat-content">
-              <h3>Interviews Completed</h3>
-              <p className="stat-value">{stats.completed}</p>
-            </div>
+            <div className="stat-icon"><i className="fas fa-calendar-check"></i></div>
+            <div className="stat-content"><h3>Interviews Completed</h3><p className="stat-value">{stats.completed}</p></div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-clock"></i>
-            </div>
-            <div className="stat-content">
-              <h3>Practice Time</h3>
-              <p className="stat-value">{stats.practiceTime} min</p>  {/* Changed from hrs to min */}
-            </div>
+            <div className="stat-icon"><i className="fas fa-clock"></i></div>
+            <div className="stat-content"><h3>Practice Time</h3><p className="stat-value">{stats.practiceTime} min</p></div>
           </div>
         </div>
 
@@ -208,17 +178,10 @@ const Dashboard = () => {
           <div className="activity-list">
             {interviews.slice(0, 3).map((item) => (
               <div className="activity-item" key={item._id}>
-                <div className="activity-icon">
-                  <i className="fas fa-briefcase"></i>
-                </div>
+                <div className="activity-icon"><i className="fas fa-briefcase"></i></div>
                 <div className="activity-details">
                   <h4>Mock Interview</h4>
-                  <p>
-                    Status: {item.status}{" "}
-                    <span className="activity-time">
-                      {new Date(item.createdAt).toLocaleDateString()}
-                    </span>
-                  </p>
+                  <p>Status: {item.status} <span className="activity-time">{new Date(item.createdAt).toLocaleDateString()}</span></p>
                 </div>
               </div>
             ))}
@@ -226,11 +189,7 @@ const Dashboard = () => {
         </section>
       </main>
 
-      <ProfileModal
-        isOpen={showProfileModal}
-        onClose={() => setShowProfileModal(false)}
-        onProfileUpdate={handleProfileUpdate}
-      />
+      <ProfileModal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} onProfileUpdate={handleProfileUpdate} />
     </div>
   );
 };

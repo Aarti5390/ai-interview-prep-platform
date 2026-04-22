@@ -1,0 +1,289 @@
+/* ============================================
+   Sticky back button (always fixed top-left)
+   ============================================ */
+.global-back-btn {
+  position: fixed !important;
+  top: 10px !important;
+  left: 10px !important;
+  z-index: 9999 !important;
+  background-color: #007bff !important;
+  color: white !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  border-radius: 30px !important;
+  font-size: 14px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;
+  white-space: nowrap !important;
+  width: auto !important;
+  max-width: fit-content !important;
+  cursor: pointer !important;
+}
+.global-back-btn:hover {
+  background-color: #0056b3 !important;
+}
+
+/* Adjust content padding so it doesn't hide under the fixed button */
+.layout-content {
+  padding-top: 80px !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+
+/* Dashboard doesn't need extra top padding */
+.layout-content.dashboard-content {
+  padding-top: 20px !important;
+}
+
+/* Mobile adjustment: smaller button and less padding */
+@media (max-width: 768px) {
+  .global-back-btn {
+    top: 8px !important;
+    left: 8px !important;
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+  .layout-content {
+    padding-top: 70px !important;
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+  }
+  .layout-content.dashboard-content {
+    padding-top: 15px !important;
+  }
+}
+
+/* ============================================
+   Global responsive overrides
+   ============================================ */
+
+/* Tablets and smaller desktops */
+@media (max-width: 1024px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    position: static;
+    min-height: auto;
+  }
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+  .admin-container {
+    padding: 1rem;
+  }
+  .admin-table th, .admin-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+  .filter-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Mobile devices (portrait) */
+@media (max-width: 768px) {
+  /* General */
+  body {
+    font-size: 14px;
+  }
+  h1 {
+    font-size: 1.5rem;
+  }
+  h2 {
+    font-size: 1.2rem;
+  }
+  button, .btn-primary, .btn-success {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  /* Dashboard */
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .start-interview-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .activity-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  /* Sidebar – text always visible, wrap if needed */
+  .sidebar {
+    width: 100%;
+    padding: 0.5rem;
+  }
+  .sidebar-header {
+    justify-content: center;
+  }
+  .sidebar-nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .sidebar-nav li {
+    width: auto;
+  }
+  .sidebar-nav a {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    white-space: nowrap;       /* prevent text from wrapping */
+  }
+  .sidebar-nav a span {
+    display: inline;           /* ensure text is visible */
+  }
+  .sidebar-footer {
+    text-align: center;
+  }
+
+  /* Admin tables */
+  .admin-table, .admin-table thead, .admin-table tbody, .admin-table th, .admin-table td, .admin-table tr {
+    display: block;
+  }
+  .admin-table thead {
+    display: none;
+  }
+  .admin-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.5rem;
+  }
+  .admin-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+  }
+  .admin-table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    width: 40%;
+  }
+
+  /* History & Statistics pages */
+  .history-card {
+    padding: 0.8rem;
+  }
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .stats-summary {
+    flex-direction: column;
+  }
+  .interview-table, .interview-table thead, .interview-table tbody, .interview-table tr, .interview-table td {
+    display: block;
+  }
+  .interview-table thead {
+    display: none;
+  }
+  .interview-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.5rem;
+  }
+  .interview-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem;
+    border-bottom: 1px solid #eee;
+  }
+  .interview-table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    width: 40%;
+  }
+
+  /* Interview page */
+  .interview-card {
+    margin: 1rem;
+    padding: 1rem;
+  }
+  .question-text {
+    font-size: 1rem;
+  }
+  textarea {
+    font-size: 0.9rem;
+  }
+  .progress-bar {
+    font-size: 0.8rem;
+  }
+
+  /* Result page */
+  .summary-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .question-review {
+    padding: 0.8rem;
+  }
+  .question-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  /* Modals */
+  .modal-content {
+    width: 95%;
+    margin: 1rem;
+    padding: 1rem;
+  }
+  .modal-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .modal-buttons button {
+    width: 100%;
+  }
+
+  /* Pagination */
+  .pagination, .pagination-controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .pagination button, .pagination-controls button {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Very small devices (<=480px) – keep text visible */
+@media (max-width: 480px) {
+  .sidebar-nav a span {
+    font-size: 0.75rem;        /* slightly smaller but still readable */
+    display: inline;
+  }
+  .sidebar-nav a i {
+    margin: 0;
+    font-size: 1rem;
+  }
+  .sidebar-nav li {
+    margin: 0 0.2rem;
+  }
+  .logo-text {
+    display: inline;           /* keep logo text on very small screens (optional) */
+    font-size: 0.9rem;
+  }
+  .content-header h1 {
+    font-size: 1.2rem;
+  }
+  .header-actions i {
+    font-size: 1rem;
+  }
+}

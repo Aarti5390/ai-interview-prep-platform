@@ -154,3 +154,22 @@
   font-size: 1.2rem;
   color: #475569;
 }
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.pagination-controls button {
+  padding: 0.3rem 0.8rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pagination-controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

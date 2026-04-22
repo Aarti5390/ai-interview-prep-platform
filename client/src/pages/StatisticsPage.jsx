@@ -86,11 +86,11 @@ const StatisticsPage = () => {
                   const avgScore = interview.questions.length ? Math.round(totalScore / interview.questions.length) : 0;
                   return (
                     <tr key={interview._id}>
-                      <td>{new Date(interview.createdAt).toLocaleDateString()}</td>
-                      <td>{interview.category || 'N/A'}</td>
-                      <td>{interview.difficulty || 'N/A'}</td>
-                      <td>{interview.status}</td>
-                      <td>{interview.status === 'completed' ? `${avgScore}%` : 'In progress'}</td>
+                      <td data-label="Date">{new Date(interview.createdAt).toLocaleDateString()}</td>
+                      <td data-label="Category">{interview.category || 'N/A'}</td>
+                      <td data-label="Difficulty">{interview.difficulty || 'N/A'}</td>
+                      <td data-label="Status">{interview.status}</td>
+                      <td data-label="Score">{interview.status === 'completed' ? `${avgScore}%` : 'In progress'}</td>
                     </tr>
                   );
                 })}

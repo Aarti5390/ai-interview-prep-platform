@@ -10,6 +10,8 @@ import HistoryPage from './pages/HistoryPage';
 import SettingsPage from './pages/SettingsPage'; 
 import AdminDashboard from './pages/AdminDashboard';
 import ErrorBoundary from './components/ErrorBoundary'; 
+import Layout from './components/layout';
+import './responsive.css';
 
 function App() {
 
@@ -20,15 +22,14 @@ function App() {
         <Route path="/" element={<LandingPage />} />
          <Route path="/login" element={<LandingPage />} />
         <Route path="/register" element={<LandingPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/interview/:id" element={<Interview />} />
-         <Route path="/interview/setup" element={<InterviewSetup />} /> 
-        <Route path="/result/:id" element={<Result />} />
-        <Route path="/statistics" element={<StatisticsPage />} />
-        <Route path="/history" element={<HistoryPage />} />
-        <Route path="/statistics" element={<StatisticsPage />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/settings" element={<SettingsPage />} />
+         <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/interview/:id" element={<Layout><Interview /></Layout>} />
+          <Route path="/interview/setup" element={<Layout><InterviewSetup /></Layout>} />
+          <Route path="/result/:id" element={<Layout><Result /></Layout>} />
+          <Route path="/statistics" element={<Layout><StatisticsPage /></Layout>} />
+          <Route path="/history" element={<Layout><HistoryPage /></Layout>} />
+          <Route path="/admin" element={<AdminDashboard />}/>
+          <Route path="/settings" element={<Layout><SettingsPage /></Layout>} />
 
       </Routes>
 

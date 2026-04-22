@@ -42,6 +42,6 @@ router.get(
     protect,
     interviewController.getHistory
 );
-
+router.delete("/:id", protect, interviewController.deleteInterview);
 
 module.exports = router;

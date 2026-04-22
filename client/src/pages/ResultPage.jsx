@@ -9,6 +9,8 @@ const ResultPage = () => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
 
   useEffect(() => {
     if (!id) {
@@ -48,7 +50,16 @@ const ResultPage = () => {
     );
   }
 
-  // Safely calculate highest score
+  // Pagination logic
+  const totalQuestions = result?.questions?.length || 0;
+  const totalPages = Math.ceil(totalQuestions / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const visibleQuestions = result?.questions?.slice(startIndex, startIndex + itemsPerPage) || [];
+
+  const goToPrevPage = () => setCurrentPage(p => Math.max(1, p - 1));
+  const goToNextPage = () => setCurrentPage(p => Math.min(totalPages, p + 1));
+
+  // Calculate highest score
   const highestScore = result?.questions?.length
     ? Math.max(...result.questions.map(q => q.score || 0))
     : 0;
@@ -75,15 +86,14 @@ const ResultPage = () => {
 
         <h2>Detailed Review</h2>
         <div className="questions-list">
-          {result.questions.map((q, index) => (
-            <div key={index} className="question-review">
+          {visibleQuestions.map((q, idx) => (
+            <div key={startIndex + idx} className="question-review">
               <div className="question-header">
-                <span className="question-number">Q{index + 1}</span>
+                <span className="question-number">Q{startIndex + idx + 1}</span>
                 <span className="question-score">Score: {q.score ?? 0}/10</span>
               </div>
               <p className="question-text"><strong>Question:</strong> {q.text}</p>
               <p className="user-answer"><strong>Your Answer:</strong> {q.userAnswer || "Not answered"}</p>
-              
               <div className="ai-feedback">
                 <strong>Strengths:</strong> {q.strengths || "—"}
               </div>
@@ -91,11 +101,19 @@ const ResultPage = () => {
                 <strong>Weaknesses:</strong> {q.weaknesses || "—"}
               </div>
               <div className="ai-feedback">
-                <strong>Suggestions for improvement:</strong> {q.suggestions || "—"}
+                <strong>Suggestions:</strong> {q.suggestions || "—"}
               </div>
             </div>
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <div className="pagination-controls">
+            <button onClick={goToPrevPage} disabled={currentPage === 1}>Previous</button>
+            <span>Page {currentPage} of {totalPages}</span>
+            <button onClick={goToNextPage} disabled={currentPage === totalPages}>Next</button>
+          </div>
+        )}
 
         <button onClick={goToDashboard} className="dashboard-btn">
           <i className="fas fa-arrow-left"></i> Back to Dashboard

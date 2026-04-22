@@ -1,0 +1,86 @@
+/* Layout.css – global layout */
+
+.layout-wrapper {
+  position: relative;
+  min-height: 100vh;
+}
+
+.global-back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  white-space: nowrap;
+}
+.global-back-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Default content padding – for pages with back button */
+.layout-content {
+  padding-top: 80px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+/* Dashboard and admin have no back button – minimal padding */
+.layout-content.dashboard-content,
+.layout-content.admin-content {
+  padding-top: 20px;
+}
+
+/* Reduced padding for History, Statistics, Settings – still enough room for the fixed button */
+.layout-content.reduced-padding {
+  padding-top: 60px;
+}
+
+/* Remove extra margin from page headings */
+.history-page h1,
+.statistics-page h1,
+.settings-page h1,
+.history-page h2,
+.statistics-page h2,
+.settings-page h2 {
+  margin-top: 0;
+  padding-top: 0;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .global-back-btn {
+    top: 10px;
+    left: 10px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  .layout-content {
+    padding-top: 70px;
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .layout-content.dashboard-content,
+  .layout-content.admin-content {
+    padding-top: 15px;
+  }
+  .layout-content.reduced-padding {
+    padding-top: 55px;
+  }
+}
+.history-page,
+.statistics-page,
+.settings-page {
+  margin-top: 0;
+  padding-top: 0;
+}

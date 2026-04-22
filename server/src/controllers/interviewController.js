@@ -60,28 +60,43 @@ exports.getQuestion = async (req, res) => {
 };
 
 // SUBMIT ANSWER
+// SUBMIT ANSWER
 exports.submitAnswer = async (req, res) => {
   try {
     const { answer } = req.body;
     const interview = await Interview.findById(req.params.id);
     if (!interview) return res.status(404).json({ message: "Interview not found" });
+
     const index = interview.currentQuestionIndex;
-    if (index >= interview.questions.length) {
-      return res.status(400).json({ message: "No more questions" });
+    if (!interview.questions || index >= interview.questions.length) {
+      return res.status(400).json({ message: "No more questions or invalid index" });
     }
+
     const question = interview.questions[index];
     const result = await evaluateAnswer(question.text, answer);
+
+    // Convert arrays to strings if needed
     const strengths = Array.isArray(result.strengths) ? result.strengths.join(', ') : result.strengths;
     const weaknesses = Array.isArray(result.weaknesses) ? result.weaknesses.join(', ') : result.weaknesses;
     const suggestions = Array.isArray(result.suggestions) ? result.suggestions.join(', ') : result.suggestions;
+
     question.userAnswer = answer;
     question.score = result.score;
     question.strengths = strengths;
     question.weaknesses = weaknesses;
     question.suggestions = suggestions;
     question.feedback = `Strengths: ${strengths}. Weaknesses: ${weaknesses}. Suggestions: ${suggestions}`;
+
     interview.currentQuestionIndex += 1;
+
+    // If interview is now complete, set endedAt
+    if (interview.currentQuestionIndex >= interview.questions.length) {
+      interview.status = "completed";
+      interview.endedAt = new Date();
+    }
+
     await interview.save();
+
     res.json({ score: result.score, message: "Answer submitted." });
   } catch (error) {
     console.error("❌ SUBMIT ANSWER ERROR:", error);
@@ -122,6 +137,22 @@ exports.getHistory = async (req, res) => {
     res.json({ interviews, total, page, pages: Math.ceil(total / limit) });
   } catch (error) {
     console.error("❌ GET HISTORY ERROR:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+// DELETE INTERVIEW
+exports.deleteInterview = async (req, res) => {
+  try {
+    const interview = await Interview.findById(req.params.id);
+    if (!interview) return res.status(404).json({ message: "Interview not found" });
+    // Ensure user owns the interview
+    if (interview.user.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+    await interview.deleteOne();
+    res.json({ message: "Interview deleted successfully" });
+  } catch (error) {
+    console.error("❌ DELETE INTERVIEW ERROR:", error);
     res.status(500).json({ message: "Server error" });
   }
 };

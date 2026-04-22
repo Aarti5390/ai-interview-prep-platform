@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import "./AdminDashboard.css";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [interviews, setInterviews] = useState([]);
@@ -72,11 +74,40 @@ const AdminDashboard = () => {
     setInterviewsPage(1);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
+  const exportUsersCSV = async () => {
+    try {
+      const response = await API.get("/admin/export/users", {
+        responseType: "blob",
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "users.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export failed:", err);
+      alert("Failed to export users. Check console for details.");
+    }
+  };
+
   if (loading) return <div className="admin-loading">Loading admin dashboard...</div>;
   if (error) return <div className="admin-error">{error}</div>;
 
   return (
     <div className="admin-container">
+      {/* Logout button at top-left, similar to back button */}
+      <button onClick={handleLogout} className="admin-logout-btn">
+        <i className="fas fa-sign-out-alt"></i> Logout
+      </button>
+
       <h1>Admin Dashboard</h1>
 
       <div className="admin-tabs">
@@ -91,7 +122,7 @@ const AdminDashboard = () => {
           <div className="stat-card"><h3>Total Interviews</h3><p>{stats.totalInterviews}</p></div>
           <div className="stat-card"><h3>Completed Interviews</h3><p>{stats.completedInterviews}</p></div>
           <div className="stat-card"><h3>Average Score</h3><p>{stats.averageScore}%</p></div>
-          <button onClick={() => window.open('/api/admin/export/users', '_blank')}>Export Users CSV</button>
+          <button onClick={exportUsersCSV} className="export-btn">Export Users CSV</button>
         </div>
       )}
 
@@ -103,10 +134,10 @@ const AdminDashboard = () => {
               <tbody>
                 {users.map(user => (
                   <tr key={user._id}>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.role || "user"}</td>
-                    <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td data-label="Name">{user.name}</td>
+                    <td data-label="Email">{user.email}</td>
+                    <td data-label="Role">{user.role || "user"}</td>
+                    <td data-label="Joined">{new Date(user.createdAt).toLocaleDateString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -140,12 +171,12 @@ const AdminDashboard = () => {
               <tbody>
                 {interviews.map(interview => (
                   <tr key={interview._id}>
-                    <td>{interview.user?.name || "Unknown"}</td>
-                    <td>{interview.category || "—"}</td>
-                    <td>{interview.difficulty || "—"}</td>
-                    <td className={`status-${interview.status}`}>{interview.status}</td>
-                    <td>{interview.questions?.length || 0}</td>
-                    <td>{new Date(interview.createdAt).toLocaleDateString()}</td>
+                    <td data-label="User">{interview.user?.name || "Unknown"}</td>
+                    <td data-label="Category">{interview.category || "—"}</td>
+                    <td data-label="Difficulty">{interview.difficulty || "—"}</td>
+                    <td data-label="Status" className={`status-${interview.status}`}>{interview.status}</td>
+                    <td data-label="Questions">{interview.questions?.length || 0}</td>
+                    <td data-label="Date">{new Date(interview.createdAt).toLocaleDateString()}</td>
                   </tr>
                 ))}
               </tbody>
