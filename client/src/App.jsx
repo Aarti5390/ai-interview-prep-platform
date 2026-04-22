@@ -10,7 +10,7 @@ import HistoryPage from './pages/HistoryPage';
 import SettingsPage from './pages/SettingsPage'; 
 import AdminDashboard from './pages/AdminDashboard';
 import ErrorBoundary from './components/ErrorBoundary'; 
-import Layout from './components/layout';
+import Layout from './components/Layout';
 import './responsive.css';
 
 
