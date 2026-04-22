@@ -43,7 +43,19 @@ const LandingPage = () => {
       localStorage.setItem("token", token);
       console.log("Token stored:", localStorage.getItem("token"));
 
-      navigate("/dashboard");
+      // 🔄 Set the token in axios default headers for subsequent requests
+      API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      // 👤 Fetch the logged-in user's data to get the role
+      const userRes = await API.get("/auth/me");
+      const userRole = userRes.data.role;
+
+      // 🚀 Redirect based on role
+      if (userRole === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (error) {
       console.error("Login error:", error.response?.data || error.message);
       setMessage({

@@ -4,153 +4,148 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-// Evaluate answer function – with explicit JSON format
+// ----------------------------------------------------------------------
+// 1. Enhanced answer evaluation with detailed rubric
+// ----------------------------------------------------------------------
 const evaluateAnswer = async (question, answer) => {
   try {
     const prompt = `
-You are a senior technical interviewer. Evaluate the candidate's answer.
+You are a senior technical interviewer with expertise in software engineering. Evaluate the candidate's answer strictly and fairly.
 
-Question:
-${question}
+Question: ${question}
+Candidate Answer: ${answer}
 
-Candidate Answer:
-${answer}
+Evaluate based on these criteria:
+1. Correctness (0-10): Is the answer factually correct? Does it address the core of the question?
+2. Completeness (0-10): Does it cover all aspects? Are there major omissions?
+3. Clarity (0-10): Is it well-structured and easy to understand? Proper grammar and terminology?
+4. Depth (0-10): Does it demonstrate deep understanding? Mentions edge cases, trade-offs, or advanced concepts?
 
-Evaluation criteria:
-- Score from 1 to 10 (1 = terrible, 10 = perfect)
-- Strengths: what they did well (short bullet)
-- Weaknesses: what they missed (short bullet)
-- Suggestions: how to improve (short bullet)
+Overall score = average of the four criteria (rounded to nearest integer, range 1-10).
 
-Return ONLY a valid JSON object in this exact format:
-{
-  "score": number,
-  "strengths": "string",
-  "weaknesses": "string",
-  "suggestions": "string"
-}
-`;
+Return ONLY a valid JSON object with these fields:
+- "score": integer (1-10)
+- "strengths": string (2-3 specific positive aspects, separated by commas)
+- "weaknesses": string (2-3 specific areas for improvement, separated by commas)
+- "suggestions": string (actionable advice to improve future answers)
+
+Example for a good answer:
+{"score": 8, "strengths": "Correctly identifies the main concept, provides a clear example", "weaknesses": "Missing discussion of edge cases, slightly verbose", "suggestions": "Add a note about handling null inputs, practice conciseness"}
+
+Example for a poor answer:
+{"score": 3, "strengths": "Attempted to answer", "weaknesses": "Factually incorrect, lacks structure, no examples", "suggestions": "Review core documentation, practice explaining concepts out loud"}
+
+Be strict but fair. Use specific feedback. Do not add any extra text outside the JSON.`;
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      model: "llama-3.3-70b-versatile", // more powerful model for better accuracy
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.2,
+      temperature: 0.3,
+      max_tokens: 500,
     });
 
     const aiText = completion.choices[0]?.message?.content;
     console.log("AI Evaluation Response:", aiText);
 
-    // Extract JSON object
     const jsonMatch = aiText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("No JSON object found");
 
     const parsed = JSON.parse(jsonMatch[0]);
 
-    // Validate and return
+    const toString = (val) => {
+      if (Array.isArray(val)) return val.join(', ');
+      if (typeof val === 'string') return val;
+      if (typeof val === 'object') return JSON.stringify(val);
+      return String(val);
+    };
+
+    let score = parsed.score;
+    if (typeof score !== 'number') score = 5;
+    score = Math.min(10, Math.max(1, Math.round(score)));
+
     return {
-      score: typeof parsed.score === 'number' ? Math.min(10, Math.max(1, parsed.score)) : 5,
-      strengths: parsed.strengths || "Good attempt",
-      weaknesses: parsed.weaknesses || "Needs improvement",
-      suggestions: parsed.suggestions || "Practice more",
+      score,
+      strengths: toString(parsed.strengths) || "Answer received",
+      weaknesses: toString(parsed.weaknesses) || "Needs more detail",
+      suggestions: toString(parsed.suggestions) || "Practice structuring your answers",
     };
   } catch (error) {
     console.error("Groq Evaluation Error:", error.message);
-    // Fallback evaluation (should not happen often)
+    // Fallback heuristic: length-based score (rough, but better than nothing)
+    const lengthScore = Math.min(10, Math.max(1, Math.floor(answer.length / 100)));
     return {
-      score: 5,
-      strengths: "Answer received",
+      score: lengthScore,
+      strengths: "Answer provided",
       weaknesses: "Could be more detailed",
-      suggestions: "Try to structure your answer better",
+      suggestions: "Try to elaborate more and use examples",
     };
   }
 };
 
-// Generate questions function (unchanged, but ensure it returns valid structure)
+// ----------------------------------------------------------------------
+// 2. Improved question generation (difficulty-aware, diverse)
+// ----------------------------------------------------------------------
 const generateQuestions = async ({ category, difficulty, numQuestions }) => {
-  console.log("🔵 generateQuestions called with:", { category, difficulty, numQuestions });
-  
+  console.log("Generating questions for:", category, difficulty, numQuestions);
+
+  // Reliable fallback (never fails)
+  const fallback = [];
+  const bank = [
+    { question: `Tell me about your experience with ${category}.`, sampleAnswer: "I have worked with it for several years..." },
+    { question: `What are the key concepts of ${category}?`, sampleAnswer: "The key concepts include..." },
+    { question: `How would you solve a problem using ${category}?`, sampleAnswer: "I would approach it by..." },
+    { question: `What are the best practices in ${category}?`, sampleAnswer: "Best practices include..." },
+    { question: `How do you stay updated with ${category}?`, sampleAnswer: "I follow blogs and take courses..." }
+  ];
+  for (let i = 0; i < numQuestions; i++) {
+    fallback.push({
+      question: bank[i % bank.length].question,
+      sampleAnswer: bank[i % bank.length].sampleAnswer,
+      userAnswer: null,
+      score: null,
+      feedback: null,
+    });
+  }
+
   try {
-    const prompt = `
-Generate exactly ${numQuestions} interview questions about "${category}" at ${difficulty} difficulty level.
+    const difficultyMap = {
+      easy: "basic conceptual questions, suitable for beginners",
+      medium: "intermediate questions requiring practical knowledge and some problem-solving",
+      hard: "advanced questions involving edge cases, performance considerations, and system design"
+    };
+    const difficultyDesc = difficultyMap[difficulty] || difficultyMap.medium;
 
-Return ONLY a valid JSON array of objects. Each object must have:
-- "question": the question text
-- "sampleAnswer": a concise, correct answer (2-3 sentences)
-
-Example: [{"question": "What is a closure?", "sampleAnswer": "A closure is a function that retains access to its lexical scope even when executed outside that scope."}]
-
-Do not include any extra text, explanations, or markdown.
-`;
+    const prompt = `Generate ${numQuestions} technical interview questions about "${category}" at ${difficulty} difficulty level (${difficultyDesc}).
+Return ONLY a JSON array of objects, each with "question" and "sampleAnswer". The sample answer should be concise (2-4 sentences).
+Make questions relevant to real-world scenarios, and ensure they vary in style (definition, scenario-based, code reasoning, trade-offs).
+Do not include any extra text outside the JSON.`;
 
     const completion = await groq.chat.completions.create({
-      model: "llama-3.1-8b-instant",
+      model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
+      temperature: 0.8,
+      max_tokens: 1000,
     });
-
     const aiText = completion.choices[0]?.message?.content;
-    console.log("📥 Raw Groq response:", aiText);
-
-    if (!aiText) throw new Error("Empty response from Groq");
-
-    let jsonMatch = aiText.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) jsonMatch = aiText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error("No JSON array found");
-
-    let questionsArray = JSON.parse(jsonMatch[0]);
-    if (!Array.isArray(questionsArray)) questionsArray = [questionsArray];
-
-    const formatted = questionsArray.slice(0, numQuestions).map(q => ({
-      question: q.question,
-      sampleAnswer: q.sampleAnswer || "",
-      userAnswer: null,
-      score: null,
-      feedback: null,
-    }));
-    
-    return formatted;
-  } catch (error) {
-    console.error("❌ Groq generate questions error:", error.message);
-    return getFallbackQuestions(category, difficulty, numQuestions);
-  }
-};
-
-// Fallback (same as before)
-const getFallbackQuestions = (category, difficulty, numQuestions) => {
-  console.log("📚 Using fallback questions for:", { category, difficulty, numQuestions });
-  const fallbackBank = {
-    JavaScript: {
-      easy: ["What is the difference between let and var?", "What is a closure?"],
-      medium: ["Explain prototypal inheritance.", "What is the event loop?"],
-      hard: ["Implement a debounce function.", "Explain the reconciliation process."]
-    },
-    React: {
-      easy: ["What is JSX?", "What is a component?"],
-      medium: ["Explain the useEffect hook.", "What is the virtual DOM?"],
-      hard: ["How do you optimize a React app?", "Explain the reconciliation process."]
-    },
-    default: {
-      easy: ["Tell me about yourself.", "What are your strengths?"],
-      medium: ["Describe a challenging project.", "How do you handle conflict?"],
-      hard: ["Explain a time you failed.", "How do you stay updated?"]
+    console.log("Generated questions raw response:", aiText);
+    const jsonMatch = aiText.match(/\[[\s\S]*\]/);
+    if (jsonMatch) {
+      const aiQuestions = JSON.parse(jsonMatch[0]);
+      if (Array.isArray(aiQuestions) && aiQuestions.length > 0) {
+        return aiQuestions.slice(0, numQuestions).map(q => ({
+          question: q.question,
+          sampleAnswer: q.sampleAnswer || "",
+          userAnswer: null,
+          score: null,
+          feedback: null,
+        }));
+      }
     }
-  };
-  
-  const catBank = fallbackBank[category] || fallbackBank.default;
-  const levelBank = catBank[difficulty] || catBank.medium || fallbackBank.default.medium;
-  
-  const questions = [];
-  for (let i = 0; i < numQuestions; i++) {
-    const questionText = levelBank[i % levelBank.length];
-    questions.push({
-      question: questionText,
-      sampleAnswer: "Sample answer would go here.",
-      userAnswer: null,
-      score: null,
-      feedback: null,
-    });
+    throw new Error("Invalid AI response");
+  } catch (err) {
+    console.error("Groq failed, using fallback questions:", err.message);
+    return fallback;
   }
-  return questions;
 };
 
 module.exports = { evaluateAnswer, generateQuestions };

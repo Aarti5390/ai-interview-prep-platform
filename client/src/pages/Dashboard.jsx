@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API from "../api/api";
+import ProfileModal from "../components/ProfileModal";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -12,6 +13,8 @@ const Dashboard = () => {
     completed: 0,
     practiceTime: 0
   });
+  const [profileCompleted, setProfileCompleted] = useState(true);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -22,6 +25,7 @@ const Dashboard = () => {
     API.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     fetchUser();
     fetchInterviews();
+    fetchProfileStatus();
   }, []);
 
   const fetchUser = async () => {
@@ -33,12 +37,25 @@ const Dashboard = () => {
     }
   };
 
+  const fetchProfileStatus = async () => {
+    try {
+      const res = await API.get("/profile/me");
+      setProfileCompleted(res.data.profileCompleted);
+    } catch (err) {
+      console.error("Profile fetch error", err);
+    }
+  };
+
   const fetchInterviews = async () => {
     try {
       const res = await API.get("/interview/history");
-      setInterviews(res.data);
 
-      const completed = res.data.filter(i => i.status === "completed");
+      // Support both old (array) and new (paginated object) response formats
+      const interviewsData = Array.isArray(res.data) ? res.data : (res.data.interviews || []);
+      setInterviews(interviewsData);
+
+      // Use interviewsData, not res.data
+      const completed = interviewsData.filter(i => i.status === "completed");
       let totalScore = 0;
       let questionCount = 0;
       completed.forEach(interview => {
@@ -50,10 +67,19 @@ const Dashboard = () => {
         });
       });
       const avgScore = questionCount ? Math.round(totalScore / questionCount) : 0;
+
+      let totalMinutes = 0;
+      completed.forEach(interview => {
+        if (interview.startedAt && interview.endedAt) {
+          const diff = new Date(interview.endedAt) - new Date(interview.startedAt);
+          totalMinutes += Math.floor(diff / 60000); // minutes
+        }
+      });
+
       setStats({
         overallScore: avgScore,
         completed: completed.length,
-        practiceTime: (completed.length * 5) / 2
+        practiceTime: totalMinutes   // store in minutes
       });
     } catch (error) {
       console.error(error);
@@ -64,9 +90,9 @@ const Dashboard = () => {
     navigate("/interview/setup");
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+  const handleProfileUpdate = (updatedUser) => {
+    setUserName(updatedUser.name);
+    setProfileCompleted(updatedUser.profileCompleted);
   };
 
   return (
@@ -118,10 +144,22 @@ const Dashboard = () => {
         <header className="content-header">
           <h1>Dashboard</h1>
           <div className="header-actions">
-            <i className="fas fa-bell"></i>
-            <i className="fas fa-envelope"></i>
+            <i
+              className="fas fa-user-circle"
+              onClick={() => setShowProfileModal(true)}
+              style={{ cursor: 'pointer' }}
+            ></i>
           </div>
         </header>
+
+        {!profileCompleted && (
+          <div className="profile-warning">
+            <span>⚠️ Your profile is incomplete. Please complete it to get better recommendations.</span>
+            <button onClick={() => setShowProfileModal(true)} className="complete-profile-btn">
+              Complete Profile
+            </button>
+          </div>
+        )}
 
         <section className="welcome-section">
           <h2>Welcome Back, {userName || "User"}!</h2>
@@ -160,7 +198,7 @@ const Dashboard = () => {
             </div>
             <div className="stat-content">
               <h3>Practice Time</h3>
-              <p className="stat-value">{stats.practiceTime} hrs</p>
+              <p className="stat-value">{stats.practiceTime} min</p>  {/* Changed from hrs to min */}
             </div>
           </div>
         </div>
@@ -187,6 +225,12 @@ const Dashboard = () => {
           </div>
         </section>
       </main>
+
+      <ProfileModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        onProfileUpdate={handleProfileUpdate}
+      />
     </div>
   );
 };

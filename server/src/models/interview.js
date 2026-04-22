@@ -24,7 +24,9 @@ const questionSchema = new mongoose.Schema({
 
 const interviewSchema = new mongoose.Schema({
   user: {
-    type: String // keep simple for now
+     type: mongoose.Schema.Types.ObjectId,
+  ref: 'User',
+  required: true
   },
   category: String,
   difficulty: String,
@@ -40,7 +42,9 @@ const interviewSchema = new mongoose.Schema({
     type: String,
     enum: ["in-progress", "completed"],
     default: "in-progress"
-  }
+  },
+  startedAt: { type: Date, default: Date.now },
+endedAt: { type: Date }
 
 }, { timestamps: true });
 

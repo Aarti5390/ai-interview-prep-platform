@@ -48,3 +48,44 @@
 .interview-table th {
   background-color: #f4f4f4;
 }
+.stats-summary {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 2rem 0;
+}
+.stat-card {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  flex: 1;
+  text-align: center;
+}
+.interview-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.interview-table th, .interview-table td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+.pagination, .pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.pagination button, .pagination-controls button {
+  padding: 0.3rem 0.8rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pagination button:disabled, .pagination-controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

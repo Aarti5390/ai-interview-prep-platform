@@ -8,12 +8,14 @@ import InterviewSetup from './pages/InterviewSetup';
 import StatisticsPage from './pages/StatisticsPage';
 import HistoryPage from './pages/HistoryPage';
 import SettingsPage from './pages/SettingsPage'; 
+import AdminDashboard from './pages/AdminDashboard';
+import ErrorBoundary from './components/ErrorBoundary'; 
 
 function App() {
 
   return (
+     <ErrorBoundary>
     <BrowserRouter>
-
       <Routes>
         <Route path="/" element={<LandingPage />} />
          <Route path="/login" element={<LandingPage />} />
@@ -25,10 +27,13 @@ function App() {
         <Route path="/statistics" element={<StatisticsPage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/statistics" element={<StatisticsPage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/settings" element={<SettingsPage />} />
 
       </Routes>
 
     </BrowserRouter>
+     </ErrorBoundary>
   );
 }
 

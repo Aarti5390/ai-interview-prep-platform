@@ -149,3 +149,25 @@
   font-size: 1.2rem;
   color: #475569;
 }
+.progress-bar {
+  background-color: #e9ecef;
+  border-radius: 20px;
+  padding: 0.25rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  display: inline-block;
+  color: #495057;
+}
+.error-container {
+  text-align: center;
+  padding: 2rem;
+}
+.retry-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 1rem;
+}

@@ -19,8 +19,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ['user', 'admin'],
       default: 'user'
-    }
+    },
+    qualification: { type: String, default: '' },
+resumeUrl: { type: String, default: '' },
+phone: { type: String, default: '' },
+location: { type: String, default: '' },
+profileCompleted: { type: Boolean, default: false },
   },
+  
   { timestamps: true }
 );
 

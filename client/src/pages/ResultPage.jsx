@@ -22,6 +22,7 @@ const ResultPage = () => {
         const res = await API.get(`/interview/${id}/result`);
         setResult(res.data);
       } catch (err) {
+        console.error("Fetch result error:", err);
         setError(err.response?.data?.message || 'Failed to load results');
       } finally {
         setLoading(false);
@@ -47,8 +48,8 @@ const ResultPage = () => {
     );
   }
 
-  // Calculate highest score from the questions array
-  const highestScore = result.questions.length > 0
+  // Safely calculate highest score
+  const highestScore = result?.questions?.length
     ? Math.max(...result.questions.map(q => q.score || 0))
     : 0;
 
@@ -78,12 +79,11 @@ const ResultPage = () => {
             <div key={index} className="question-review">
               <div className="question-header">
                 <span className="question-number">Q{index + 1}</span>
-                <span className="question-score">Score: {q.score}/10</span>
+                <span className="question-score">Score: {q.score ?? 0}/10</span>
               </div>
               <p className="question-text"><strong>Question:</strong> {q.text}</p>
               <p className="user-answer"><strong>Your Answer:</strong> {q.userAnswer || "Not answered"}</p>
               
-              {/* Display the three detailed feedback fields */}
               <div className="ai-feedback">
                 <strong>Strengths:</strong> {q.strengths || "—"}
               </div>

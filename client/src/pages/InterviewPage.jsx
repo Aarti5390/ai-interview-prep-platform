@@ -12,26 +12,27 @@ const InterviewPage = () => {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    fetchQuestion();
-  }, []);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [totalQuestions, setTotalQuestions] = useState(0);
 
   const fetchQuestion = async () => {
     setLoading(true);
     setError('');
-    setAnswer('');
 
     try {
       const res = await API.get(`/interview/${id}/question`);
       const data = res.data;
+      console.log("Fetch question response:", data);
 
-      if (!data || data.completed) {
+      if (data.completed === true) {
         navigate(`/result/${id}`);
         return;
       }
 
       setCurrentQuestion(data.question);
+      setCurrentIndex(data.currentIndex);
+      setTotalQuestions(data.totalQuestions);
+      setAnswer(''); // ✅ Always clear the answer for a new question
     } catch (err) {
       console.error("Fetch Question Error:", err);
       setError(err.response?.data?.message || 'Failed to load question');
@@ -39,6 +40,10 @@ const InterviewPage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchQuestion();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,11 +54,10 @@ const InterviewPage = () => {
 
     try {
       await API.post(`/interview/${id}/answer`, { answer });
-      // Immediately load the next question (or results)
-      await fetchQuestion();
+      await fetchQuestion(); // Load next question – will clear the answer box
     } catch (err) {
       console.error("Submit Answer Error:", err);
-      setError(err.response?.data?.message || 'Failed to submit answer');
+      setError(err.response?.data?.message || "Failed to submit answer. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -72,11 +76,13 @@ const InterviewPage = () => {
 
         {currentQuestion ? (
           <>
+            <div className="progress-bar">
+              Question {currentIndex} of {totalQuestions}
+            </div>
             <div className="question-section">
               <h2>Question</h2>
               <p className="question-text">{currentQuestion}</p>
             </div>
-
             <form onSubmit={handleSubmit} className="answer-form">
               <h3>Your Answer</h3>
               <textarea
@@ -92,7 +98,14 @@ const InterviewPage = () => {
             </form>
           </>
         ) : (
-          !loading && <p>No more questions. Redirecting...</p>
+          !loading && (
+            <div className="error-container">
+              <p>No questions found for this interview.</p>
+              <button onClick={() => navigate('/interview/setup')} className="retry-btn">
+                Start New Interview
+              </button>
+            </div>
+          )
         )}
       </div>
     </div>
