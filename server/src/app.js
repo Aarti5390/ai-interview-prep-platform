@@ -7,7 +7,7 @@ const path = require("path");
 
 
 const app = express();
-app.use(cors({ origin: 'https://ai-interview-prep-platform-pcwcvp393-aarti5390s-projects.vercel.app' }));
+app.use(cors({ origin: true }));  // Reflects the request origin
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
