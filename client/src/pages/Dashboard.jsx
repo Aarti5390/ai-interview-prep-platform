@@ -65,18 +65,16 @@ const Dashboard = () => {
       });
       const avgScore = questionCount ? Math.round(totalScore / questionCount) : 0;
 
-      // Calculate total practice time in minutes
       let totalMinutes = 0;
-completed.forEach(interview => {
-  if (interview.startedAt && interview.endedAt) {
-    const diff = new Date(interview.endedAt) - new Date(interview.startedAt);
-    totalMinutes += Math.floor(diff / 60000);
-  } else {
-    // Fallback: assume 2 minutes per question for old interviews
-    const answeredCount = interview.questions.filter(q => q.userAnswer).length;
-    totalMinutes += answeredCount * 2; // 2 minutes per answered question
-  }
-});
+      completed.forEach(interview => {
+        if (interview.startedAt && interview.endedAt) {
+          const diff = new Date(interview.endedAt) - new Date(interview.startedAt);
+          totalMinutes += Math.floor(diff / 60000);
+        } else {
+          const answeredCount = interview.questions.filter(q => q.userAnswer).length;
+          totalMinutes += answeredCount * 2;
+        }
+      });
 
       setStats({
         overallScore: avgScore,
@@ -118,27 +116,18 @@ completed.forEach(interview => {
             <li><Link to="/settings"><i className="fas fa-cog"></i><span>Settings</span></Link></li>
           </ul>
         </nav>
-
-        <div className="sidebar-footer">
-          <div className="user-info">
-            <i className="fas fa-user-circle"></i>
-            <span>{userName || "User"}</span>
-          </div>
-        </div>
       </aside>
 
       <main className="main-content">
         <header className="content-header">
-          <h1>Dashboard</h1>
+          <div className="header-left"></div>
           <div className="header-actions">
-            <button onClick={handleLogout} className="logout-header-btn" title="Logout">
+            <button onClick={handleLogout} className="icon-btn logout-btn" title="Logout">
               <i className="fas fa-sign-out-alt"></i>
             </button>
-            <i
-              className="fas fa-user-circle"
-              onClick={() => setShowProfileModal(true)}
-              style={{ cursor: 'pointer' }}
-            ></i>
+            <button onClick={() => setShowProfileModal(true)} className="icon-btn profile-btn" title="Profile">
+              <i className="fas fa-user-circle"></i>
+            </button>
           </div>
         </header>
 

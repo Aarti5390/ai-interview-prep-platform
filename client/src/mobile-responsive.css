@@ -1,0 +1,222 @@
+/* ==================================================
+   MOBILE RESPONSIVE FIX – ONLY FOR SMALL SCREENS
+   ================================================== */
+
+/* Tablet and mobile (max-width: 1024px) */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  .sidebar-nav ul {
+    display: inline-flex;
+    gap: 1rem;
+  }
+  .sidebar-nav li {
+    display: inline-block;
+  }
+}
+
+/* Mobile devices (max-width: 768px) */
+@media (max-width: 768px) {
+  /* Reset any weird margins/paddings */
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Main containers */
+  .dashboard-container,
+  .admin-container,
+  .result-container,
+  .statistics-page,
+  .history-page,
+  .settings-page,
+  .interview-container,
+  .setup-container {
+    width: 100%;
+    padding: 0 0.5rem !important;
+    margin: 0 !important;
+  }
+
+  /* Cards become full width */
+  .dashboard-card,
+  .result-card,
+  .stat-card,
+  .history-card,
+  .settings-card,
+  .interview-card,
+  .setup-card,
+  .modal-content {
+    width: 95%;
+    margin: 0.75rem auto;
+    padding: 1rem;
+    border-radius: 16px;
+  }
+
+  /* Typography */
+  h1 {
+    font-size: 1.5rem !important;
+    text-align: center;
+  }
+  h2 {
+    font-size: 1.3rem !important;
+  }
+  p, li, button, input, textarea, select {
+    font-size: 0.95rem !important;
+  }
+
+  /* Buttons: full width on mobile */
+  button,
+  .btn-primary,
+  .btn-success,
+  .dashboard-btn,
+  .pdf-download-btn,
+  .start-interview-btn,
+  .view-result-btn,
+  .complete-profile-btn,
+  .logout-btn,
+  .next-btn,
+  .retry-btn {
+    width: 100%;
+    padding: 0.7rem;
+    margin: 0.3rem 0;
+    border-radius: 40px;
+    font-size: 0.95rem;
+  }
+
+  /* Forms */
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 0.7rem;
+    font-size: 0.95rem;
+    border-radius: 12px;
+  }
+
+  /* Stats grid – single column */
+  .stats-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .stat-card {
+    width: 100%;
+  }
+
+  /* Tables – convert to cards */
+  .admin-table,
+  .interview-table {
+    display: block;
+    width: 100%;
+  }
+  .admin-table thead,
+  .interview-table thead {
+    display: none;
+  }
+  .admin-table tr,
+  .interview-table tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 16px;
+    padding: 0.8rem;
+  }
+  .admin-table td,
+  .interview-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border-color, #eee);
+  }
+  .admin-table td::before,
+  .interview-table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    width: 40%;
+  }
+
+  /* Pagination */
+  .pagination,
+  .pagination-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+  .pagination button,
+  .pagination-controls button {
+    width: auto;
+    padding: 0.4rem 0.8rem;
+  }
+
+  /* Modal – full screen on phone */
+  .modal-overlay {
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+  .modal-content {
+    width: 95%;
+    margin: 1rem auto;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  /* Interview page */
+  .question-text {
+    font-size: 1rem;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+  textarea {
+    font-size: 0.95rem;
+    padding: 0.7rem;
+  }
+
+  /* Result page action buttons */
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .pdf-download-btn,
+  .dashboard-btn {
+    width: 100%;
+  }
+
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Adjust layout content top padding for back button */
+  .layout-content {
+    padding-top: 60px !important;
+  }
+}
+
+/* Very small devices (max-width: 480px) */
+@media (max-width: 480px) {
+  .layout-content {
+    padding-top: 55px !important;
+  }
+  .global-back-btn {
+    top: 6px;
+    left: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+  h1 {
+    font-size: 1.3rem !important;
+  }
+  h2 {
+    font-size: 1.1rem !important;
+  }
+}

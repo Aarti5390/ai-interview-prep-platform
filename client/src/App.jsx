@@ -12,6 +12,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ErrorBoundary from './components/ErrorBoundary'; 
 import Layout from './components/Layout';
 import './responsive.css';
+import './mobile-responsive.css';
 
 
 function App() {
