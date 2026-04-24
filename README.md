@@ -76,8 +76,6 @@ Built with the **MERN stack** (MongoDB, Express, React, Node.js), it also includ
 
 ## 📸 Screenshots
 
-> Add your screenshots inside the `screenshots/` folder and update the paths.
-
 ![Home page](./screenshots/home.png)
 ![Dashboard](./screenshots/dashboard.png)
 ![Interview Page](./screenshots/interview.png)
